@@ -39,7 +39,7 @@ def main():
                     # 提取线路名称
                     td_centers = busLine.find_all('td')
                     name = td_centers[0].text.strip()
-                    
+
                     # 只将线路名称写入文件，每行一个
                     file.write(name + '\n')
                     
