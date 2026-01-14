@@ -1,0 +1,10 @@
+flask
+flask-cors
+sqlalchemy
+psycopg2
+geoalchemy2
+pandas
+geopandas
+shapely
+requests
+beautifulsoup4

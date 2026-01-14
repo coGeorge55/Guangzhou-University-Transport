@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高校周边公交查询系统</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+     
+    <style>
+        body { margin: 0; padding: 0; font-family: "Microsoft YaHei", sans-serif; }
+        
+        /* 地图容器全屏 */
+        #map { height: 100vh; width: 100%; z-index: 1; }
+
+        /* 悬浮面板样式 (参考 crimeMap.html) */
+        .control-panel {
+            position: absolute;
+            top: 20px;
+            left: 50px;
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000; /* 保证在地图上方 */
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+            border-left: 4px solid #4a90e2;
+            padding-left: 10px;
+        }
+
+        .form-group { margin-bottom: 15px; }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box; /* 确保padding不撑大宽度 */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        button:hover { background-color: #357abd; }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f0f7ff;
+            border: 1px solid #cce4ff;
+            border-radius: 4px;
+            display: none; /* 默认隐藏 */
+        }
+        
+        .result-item { margin: 5px 0; font-size: 14px; color: #555; }
+        .highlight { color: #d9534f; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="control-panel">
+        <div class="panel-title">高校公共交通可达性分析</div>
+        
+        <div class="form-group">
+            <input type="text" id="uniName" placeholder="请输入高校名称（如：广州大学）" value="广州大学">
+        </div>
+        
+        <button onclick="searchBusStop()" style="margin-bottom: 10px;">查询最近站点</button>
+        
+        <button onclick="loadStats()" style="background-color: #ff9800; margin-bottom: 15px;">查询缓冲区公交站点数量</button>
+
+        <div id="resultInfo" class="result-box" style="display:none; margin-bottom: 15px;">
+            <div class="result-item">学校：<span id="res-uni" class="highlight"></span></div>
+            <div class="result-item">最近：<span id="res-station" class="highlight"></span></div>
+            <div class="result-item">距离：<span id="res-dist"></span> 米</div>
+        </div>
+
+        <div id="statsList" style="display:none; border-top: 1px solid #eee; padding-top: 10px;">
+            <div style="font-size: 14px; color: #666; margin-bottom: 5px;">100m内站点数量排行</div>
+            <div style="max-height: 250px; overflow-y: auto; background: #fff;">
+                <table style="width:100%; font-size:13px; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background:#f5f5f5; text-align:left;">
+                            <th style="padding:5px; position: sticky; top: 0; background: #f5f5f5;">高校名</th>
+                            <th style="padding:5px; text-align:right; position: sticky; top: 0; background: #f5f5f5;">数量</th>
+                        </tr>
+                    </thead>
+                    <tbody id="statsTableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+            
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+    <script>
+        // 1. 初始化地图 (中心点设为广州, 缩放级别 12)
+        var map = L.map('map').setView([23.1291, 113.2644], 12);
+
+        // 2. 添加底图 (使用 OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        var currentMarker = null; // 用于存储当前地图上的标记
+
+        // 3. 核心功能：调用 API 并上图
+        async function searchBusStop() {
+            var name = document.getElementById('uniName').value.trim();
+            if (!name) { alert("请输入学校名称！"); return; }
+
+            // 显示加载状态（可选）
+            var btn = document.querySelector('button');
+            var originalText = btn.innerText;
+            btn.innerText = "查询中...";
+            btn.disabled = true;
+
+            try {
+                // 调用您的 Flask API (确保后端已启动并在 5000 端口)
+                // 注意：Fetch URL 要和后端地址一致
+                const response = await fetch(`http://127.0.0.1:5000/api/nearest_bus_stop?name=${encodeURIComponent(name)}`);
+                
+                if (!response.ok) {
+                    throw new Error("未找到该学校或数据接口异常");
+                }
+
+                const data = await response.json();
+
+                // 解析数据
+                // 后端返回 coordinates: [lon, lat] -> Leaflet 需要 [lat, lon]
+                const lat = data.coordinates[1];
+                const lon = data.coordinates[0];
+                const stationName = data.station;
+                const dist = data.distance_meters;
+
+                // 更新面板信息
+                document.getElementById('res-uni').innerText = name;
+                document.getElementById('res-station').innerText = stationName;
+                document.getElementById('res-dist').innerText = dist;
+                document.getElementById('resultInfo').style.display = 'block';
+
+                // 地图操作
+                if (currentMarker) {
+                    map.removeLayer(currentMarker); // 清除上一个标记
+                }
+
+                // 添加新标记
+                currentMarker = L.marker([lat, lon]).addTo(map)
+                    .bindPopup(`<b>${stationName}</b><br>距离 ${name} 约 ${dist} 米`)
+                    .openPopup();
+
+                // 飞到目标位置
+                map.flyTo([lat, lon], 16);
+
+            } catch (error) {
+                alert("查询失败：" + error.message);
+                console.error(error);
+            } finally {
+                // 恢复按钮
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+// 获取统计数据
+async function loadStats() {
+    var btn = event.target;
+    btn.innerText = "加载中...";
+    btn.disabled = true;
+
+    try {
+        // 1. 调用刚才写好的新接口
+        const response = await fetch('http://127.0.0.1:5000/api/stats');
+        const data = await response.json();
+
+        const tbody = document.getElementById('statsTableBody');
+        tbody.innerHTML = ""; // 清空旧数据
+
+        // 2. 循环生成表格行
+        data.forEach((item, index) => {
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = "1px solid #eee";
+            tr.style.cursor = "pointer";
+            
+            // 鼠标悬停变色效果
+            tr.onmouseover = function() { this.style.backgroundColor = "#fff3e0"; };
+            tr.onmouseout = function() { this.style.backgroundColor = "white"; };
+            
+            // 3. 点击行：地图飞到该学校
+            tr.onclick = function() {
+                // 清除旧标记
+                if (currentMarker) map.removeLayer(currentMarker);
+                
+                // 飞到位置
+                map.flyTo([item.lat, item.lon], 16);
+                
+                // 添加标记
+                currentMarker = L.marker([item.lat, item.lon]).addTo(map)
+                    .bindPopup(`<b>${item.name}</b><br>周边500米公交站：${item.count} 个`)
+                    .openPopup();
+            };
+
+            // 插入单元格
+            tr.innerHTML = `
+                <td style="padding:8px;">
+                    <span style="font-weight:bold; color:#555;">${index + 1}.</span> ${item.name}
+                </td>
+                <td style="padding:8px; text-align:right; font-weight:bold; color:#ff9800;">
+                    ${item.count}
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // 显示列表
+        document.getElementById('statsList').style.display = 'block';
+
+    } catch (error) {
+        alert("加载失败：" + error.message);
+    } finally {
+        btn.innerText = "加载站点数量排行";
+        btn.disabled = false;
+    }
+}
+
+
+    </script>
+</body>
+</html>
