@@ -4,7 +4,7 @@ from shapely.ops import transform
 import math
 import os
 
-# 坐标转换算法模块 (参考 Coors_Transform)
+# 坐标转换算法模块
 # 包含：BD09MC -> BD09 -> GCJ02 -> WGS84
 x_pi = 3.14159265358979324 * 3000.0 / 180.0
 pi = math.pi
