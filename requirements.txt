@@ -1,10 +1,12 @@
 flask
 flask-cors
 sqlalchemy
-psycopg2
+psycopg2-binary
 geoalchemy2
 pandas
 geopandas
 shapely
 requests
 beautifulsoup4
+html5lib
+rtree
