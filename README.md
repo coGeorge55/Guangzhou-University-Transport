@@ -1,5 +1,5 @@
 # Guangzhou University Public Transport Accessibility Analysis
-# 广州高校公共交通可达性分析后端
+# 广州高校公共交通可达性分析
 
 本项目旨在构建一个基于 GIS 的后端系统，用于分析广州市各高校周边的公共交通覆盖情况。项目包含完整的数据处理流水线，涵盖数据抓取、坐标转换、空间裁剪（Spatial Clip）到 PostGIS 数据库自动化入库。
 
