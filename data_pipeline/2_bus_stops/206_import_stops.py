@@ -30,9 +30,7 @@ def ingest_bus_stops_to_postgis():
         print(f"错误：找不到文件 {INPUT_SHP}，请检查路径。")
         return
 
-    # ---------------------------------------------------------
     # 步骤 0：自动为数据库开启 PostGIS 插件 (如果尚未开启)
-    # ---------------------------------------------------------
     print("正在连接数据库...", end="")
     try:
         with engine.connect() as conn:
@@ -43,10 +41,8 @@ def ingest_bus_stops_to_postgis():
     except Exception as e:
         print(f"\n数据库连接失败: {e}")
         return
-        
-    # ---------------------------------------------------------
+   
     # 步骤 1：读取 Shapefile 数据
-    # ---------------------------------------------------------
     print(f"正在读取 Shapefile: {INPUT_SHP}")
     try:
         gdf = gpd.read_file(INPUT_SHP, encoding='utf-8')
@@ -56,9 +52,7 @@ def ingest_bus_stops_to_postgis():
 
     print(f"   共读取到 {len(gdf)} 条公交站点数据。")
 
-    # ---------------------------------------------------------
     # 步骤 2：数据清洗与检查
-    # ---------------------------------------------------------
     # 确保坐标系是 WGS84 (EPSG:4326)
     if gdf.crs is None:
         print("   警告：源数据缺少坐标系信息，默认为 EPSG:4326")
@@ -67,9 +61,7 @@ def ingest_bus_stops_to_postgis():
         print(f"   正在将坐标系从 {gdf.crs.to_string()} 转换为 EPSG:4326...")
         gdf = gdf.to_crs("EPSG:4326")
 
-    # ---------------------------------------------------------
     # 步骤 3：写入 PostGIS 数据库
-    # ---------------------------------------------------------
     print(f"正在写入表 '{TABLE_NAME}' (SRID: 4326)...")
     
     try:
@@ -79,7 +71,7 @@ def ingest_bus_stops_to_postgis():
             if_exists='replace',      # 如果表存在则替换 ('fail', 'replace', 'append')
             index=False,              # 不将 DataFrame 的索引写入为单独的列
             dtype={
-                'geometry': Geometry('POINT', srid=4326) # 关键：指定几何类型为点 (POINT)
+                'geometry': Geometry('Point', srid=4326) # 关键：指定几何类型为点 (Point)
             }
         )
         print(f"写入成功！公交站点数据已存入表: {TABLE_NAME}")
