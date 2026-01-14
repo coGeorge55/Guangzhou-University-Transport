@@ -6,7 +6,7 @@ import os
 
 # 【配置区】
 DB_USER = "postgres"
-# ⬇️⬇️⬇️ 请确认这里填的是正确的密码
+#请确认这里填的是正确的密码
 DB_PASSWORD = "your_password_here" 
 DB_HOST = "localhost"
 DB_PORT = "5432"
@@ -63,7 +63,7 @@ def ingest_data_to_postgis():
         print("正在规范化几何数据 (Polygon -> MultiPolygon)...")
         gdf["geometry"] = gdf["geometry"].apply(promote_to_multi)
         
-        print(f"正在写入表 '{TABLE_NAME}' (SRID: 4326)...") #
+        print(f"正在写入表 '{TABLE_NAME}' (SRID: 4326)...") 
         gdf.to_postgis(
             name=TABLE_NAME, # 数据库表名
             con=engine,
