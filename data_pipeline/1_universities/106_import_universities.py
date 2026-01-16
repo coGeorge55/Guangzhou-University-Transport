@@ -45,7 +45,7 @@ def ingest_data_to_postgis():
  
         print("正在连接数据库...", end="")
         with engine.connect() as conn:
-            # 1. 启用 PostGIS 扩展 (解决 'geometry 不存在' 的报错)
+            # 1. 启用 PostGIS 扩展 
             print("正在启用 PostGIS 扩展...")
             conn.execute(text("CREATE EXTENSION IF NOT EXISTS postgis;"))
             conn.commit() # 提交更改
