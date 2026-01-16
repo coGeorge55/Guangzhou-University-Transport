@@ -71,7 +71,7 @@ def main():
     project_root = os.path.dirname(os.path.dirname(current_dir))
     data_raw_dir = os.path.join(project_root, 'data', 'raw')
 
-    input_csv = os.path.join(data_raw_dir, "university_geo_v2.csv")
+    input_csv = os.path.join(data_raw_dir, "university_geo.csv")
     output_pkl = os.path.join(data_raw_dir, "university_bd09mc.pkl")
 
     print(f"Reading {input_csv}...")
