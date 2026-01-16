@@ -144,12 +144,11 @@
             btn.disabled = true;
 
             try {
-                // 调用您的 Flask API (确保后端已启动并在 5000 端口)
-                // 注意：Fetch URL 要和后端地址一致
+                // 调用接口1
                 const response = await fetch(`http://127.0.0.1:5000/api/nearest_bus_stop?name=${encodeURIComponent(name)}`);
                 
                 if (!response.ok) {
-                    throw new Error("未找到该学校或数据接口异常");
+                    throw new 错误("未找到该学校或数据接口异常");
                 }
 
                 const data = await response.json();
@@ -197,7 +196,7 @@ async function loadStats() {
     btn.disabled = true;
 
     try {
-        // 1. 调用刚才写好的新接口
+        // 1. 调用接口2
         const response = await fetch('http://127.0.0.1:5000/api/stats');
         const data = await response.json();
 
