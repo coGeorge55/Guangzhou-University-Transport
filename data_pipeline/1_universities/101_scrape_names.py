@@ -54,7 +54,7 @@ def fetch_university_list():
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        output_file = os.path.join(output_dir, "guangzhou_universities.csv")
+        output_file = os.path.join(output_dir, "universities.csv")
 
         df.to_csv(output_file, index=False, encoding='utf-8-sig')
         print(f"成功爬取 {len(universities)} 所广州高校名单，已保存至 {output_file}。")
