@@ -14,8 +14,8 @@ from urllib3.util.retry import Retry
 current_dir = os.path.dirname(os.path.abspath(__file__))
 # 获取项目根目录 (.../Guangzhou-University-Transport)
 project_root = os.path.dirname(os.path.dirname(current_dir))
-# 设置保存目录为 data/raw/bus_stations_final
-SAVE_DIR = os.path.join(project_root, 'data', 'raw', 'bus_stations_final')
+# 设置保存目录为 data/raw/bus_stations_stops
+SAVE_DIR = os.path.join(project_root, 'data', 'raw', 'bus_stations_stops')
 
 TIMEOUT = 30  # 超时时间延长到30秒
 MAX_RETRIES = 3 # 最大重试次数
