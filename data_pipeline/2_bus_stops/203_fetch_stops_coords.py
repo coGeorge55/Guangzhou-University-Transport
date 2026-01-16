@@ -15,8 +15,8 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(os.path.dirname(current_dir))
 data_raw_dir = os.path.join(project_root, 'data', 'raw')
 
-# 输入文件夹: data/raw/bus_stations_final
-INPUT_DIR = os.path.join(data_raw_dir, "bus_stations_final")
+# 输入文件夹: data/raw/bus_stops
+INPUT_DIR = os.path.join(data_raw_dir, "bus_stops")
 # 输出文件: data/raw/bus_stops_bd09mc.csv
 OUTPUT_CSV = os.path.join(data_raw_dir, "bus_stops_bd09mc.csv")
 
