@@ -127,15 +127,13 @@ def main():
     project_root = os.path.dirname(os.path.dirname(current_dir))
     data_raw_dir = os.path.join(project_root, 'data', 'raw')
 
-    # 输入文件 (对应上一步生成的 universities.csv)
-    input_path = os.path.join(data_raw_dir, "universities.csv")
+    # 输入文件 
+    input_path = os.path.join(data_raw_dir, "University Name.csv")
     # 输出文件
     output_path = os.path.join(data_raw_dir, "university_geo.csv")
 
     # 读取文件
     try:
-        # 注意：这里读取的列名可能需要根据 1_scrape_names.py 的输出微调
-        # 上一步输出的列名是 "University Name"
         df = pd.read_csv(input_path, encoding='utf-8')
     except:
         df = pd.read_csv(input_path, encoding='gbk')
