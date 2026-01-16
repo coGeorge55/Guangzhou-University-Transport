@@ -130,7 +130,7 @@ def main():
     # 输入文件 (对应上一步生成的 guangzhou_universities.csv)
     input_path = os.path.join(data_raw_dir, "guangzhou_universities.csv")
     # 输出文件
-    output_path = os.path.join(data_raw_dir, "university_geo_v2.csv")
+    output_path = os.path.join(data_raw_dir, "university_geo.csv")
 
     # 读取文件
     try:
