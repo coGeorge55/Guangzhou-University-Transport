@@ -36,6 +36,8 @@ def get_nearest_bus_stop():
                 return jsonify({
                     "station": result.station_name,
                     "distance_meters": round(result.dist, 2),
+                    "lat": result.lat,
+                    "lon": result.lon,
                     "coordinates": [result.lon, result.lat]
                 })
             else:
