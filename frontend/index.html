@@ -92,6 +92,7 @@
             <div class="result-item">学校：<span id="res-uni" class="highlight"></span></div>
             <div class="result-item">最近：<span id="res-station" class="highlight"></span></div>
             <div class="result-item">距离：<span id="res-dist"></span> 米</div>
+            <div class="result-item">坐标：<span id="res-coord"></span></div>
         </div>
 
         <div id="statsList" style="display:none; border-top: 1px solid #eee; padding-top: 10px;">
@@ -163,7 +164,8 @@
                 // 更新面板信息
                 document.getElementById('res-uni').innerText = name;
                 document。getElementById('res-station').innerText = stationName;
-                document.getElementById('res-dist').innerText = dist;
+                document。getElementById('res-dist').innerText = dist;
+                document.getElementById('res-coord').innerText = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
                 document.getElementById('resultInfo').style.display = 'block';
 
                 // 地图操作
